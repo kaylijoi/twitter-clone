@@ -1,0 +1,54 @@
+{% extends 'tweets/base.html' %}
+
+{% block content %}
+Welcome to Twitter
+
+<div id='tweets'>
+  Loading...
+</div>
+
+<script>
+  const tweetsElement = document.getElementById("tweets")
+
+
+  const xhr = new XMLHttpRequest()
+  const method = 'GET'
+  const url = "/tweets"
+  const responseType = "json"
+
+  function handleLike (tweet_id, currentCount) {
+    console.log(tweet_id, currentCount)
+  }
+
+  function LikeBtn(tweet) {
+    return "<button class='btn btn-primary' onclick=handleLike(" + tweet.id + "," + tweet.likes + ")>" + tweet.likes + " Likes</button>"
+  }
+
+  function formatTweetElement(tweet) {
+    var formattedTweet = "<div class='mb-4 tweet' id='tweet-" + tweet.id + "'><p>" + tweet.content + "</p><div class='btn-group'>" + LikeBtn(tweet) + "</div></div>"
+    return formattedTweet
+  }
+
+  xhr.responseType = responseType
+  xhr.open(method, url)
+  xhr.onload = function() {
+    const serverResponse = xhr.response
+    var listedItems = serverResponse.response
+    var finalTweetStr = ""
+    var i;
+
+    for (i = 0; i < listedItems.length; i++) {
+      console.log(listedItems[i])
+      var tweetObj = listedItems[i]
+      var currentItem = formatTweetElement(tweetObj)
+      finalTweetStr += currentItem
+    }
+    tweetsElement.innerHTML = finalTweetStr
+
+    console.log(listedItems)
+
+  }
+  xhr.send()
+</script>
+
+{% endblock content %}
