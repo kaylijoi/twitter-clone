@@ -12,7 +12,6 @@
   <div class='col-md-4 mx-auto col-10'>
     <form class='form' id='tweet-create-form' method='POST' actions='/create-tweet'>
       {% csrf_token %}
-
       <input type='hidden' value='/' name='next' />
       <textarea required='required' class='form-control' name='content' placeholder='Your tweet...'></textarea>
       <button type='submit' class='btn btn-primary'>Tweet</button>
@@ -25,8 +24,18 @@
 </div>
 
 
-
 <script>
+  function handleTweetFormError(msg, display){
+    var myErrorDiv = document.getElementById("tweet-create-form-error")
+    if (display === true) {
+      myErrorDiv.setAttribute("class", "d-block alert alert-danger")
+      myErrorDiv.innerText = msg
+    } else {
+      myErrorDiv.setAttribute("class", "d-none alert alert-danger")
+    }
+  }
+
+
   function handleTweetCreateFormSubmit(event) {
     event.preventDefault()
     const myForm = event.target
@@ -41,6 +50,7 @@
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
     xhr.onload = function() {
       if(xhr.status === 201) {
+        handleTweetFormError("", false)
         const newTweetJson = xhr.response
         const newTweetElement = formatTweetElement(newTweetJson)
         const ogHtml = tweetsContainerElement.innerHTML
@@ -54,8 +64,13 @@
       } else if (xhr.status === 401) {
         alert("Please Login")
         window.location.href = "/login"
+
       } else if (xhr.status === 500) {
         alert("There was a server error. Please try again.")
+      
+      } else if (xhr.status === 403) {
+        alert("Please Login")
+        window.location.href = "/login"
       }
     }
     xhr.onerror = function() {
@@ -101,6 +116,7 @@
 
   function handleLike (tweet_id, currentCount) {
     console.log(tweet_id, currentCount)
+    return
   }
 
   function LikeBtn(tweet) {
